@@ -12,9 +12,9 @@ public class ExpenseMapper {
         e.setDescription(req.getDescription());
         e.setCategory(req.getCategory());
         e.setSpentAt(req.getSpentAt()); // can be null -> your @PrePersist sets default
-        return e;
+        return e; 
     }
-
+ 
     public static ExpenseResponse toResponse(Expense e) {
         return new ExpenseResponse(
                 e.getId(),
