@@ -3,8 +3,11 @@ package com.wanna.expensetracker.expense.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.wanna.expensetracker.entity.TransactionType;
+
 public class ExpenseResponse {
     private Long id;
+    private TransactionType type;
     private BigDecimal amount;
     private String description;
     private String category;
@@ -14,9 +17,10 @@ public class ExpenseResponse {
 
     public ExpenseResponse() {}
 
-    public ExpenseResponse(Long id, BigDecimal amount, String description, String category,
+    public ExpenseResponse(Long id,TransactionType type, BigDecimal amount, String description, String category,
                            LocalDateTime spentAt, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
+        this.type = type;
         this.amount = amount;
         this.description = description;
         this.category = category;
@@ -26,6 +30,7 @@ public class ExpenseResponse {
     }
 
     public Long getId() { return id; }
+    public TransactionType getType(){ return type; }
     public BigDecimal getAmount() { return amount; }
     public String getDescription() { return description; }
     public String getCategory() { return category; }
@@ -34,6 +39,7 @@ public class ExpenseResponse {
     public LocalDateTime getUpdatedAt() { return updatedAt; }
 
     public void setId(Long id) { this.id = id; }
+    public void setType(TransactionType type) { this.type = type; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }
     public void setDescription(String description) { this.description = description; }
     public void setCategory(String category) { this.category = category; }

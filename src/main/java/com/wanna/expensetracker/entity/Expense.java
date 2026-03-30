@@ -8,6 +8,8 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -25,6 +27,10 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
+    @NotNull(message = "type is required")
+    @Enumerated(EnumType.STRING)
+    private TransactionType type;
 
     @NotNull(message = "amount is required")
     @DecimalMin(value = "0.01", message = "amount must be > 0")
@@ -38,7 +44,7 @@ public class Expense {
     private LocalDateTime spentAt;
 
     @Column(length = 50)
-    private String category; // keep as String for now (easy)
+    private String category; 
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -60,6 +66,9 @@ public class Expense {
 
     // --- Getters/Setters ---
     public Long getId() { return id; }
+    
+    public TransactionType getType() { return type; }
+    public void setType(TransactionType type) { this.type = type; }
 
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }

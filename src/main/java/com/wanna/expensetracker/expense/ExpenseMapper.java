@@ -8,6 +8,7 @@ public class ExpenseMapper {
 
     public static Expense toEntity(ExpenseCreateRequest req) {
         Expense e = new Expense();
+        e.setType(req.getType());
         e.setAmount(req.getAmount());
         e.setDescription(req.getDescription());
         e.setCategory(req.getCategory());
@@ -18,6 +19,7 @@ public class ExpenseMapper {
     public static ExpenseResponse toResponse(Expense e) {
         return new ExpenseResponse(
                 e.getId(),
+                e.getType(),
                 e.getAmount(),
                 e.getDescription(),
                 e.getCategory(),

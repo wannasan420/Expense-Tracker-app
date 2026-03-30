@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.wanna.expensetracker.entity.Expense;
+import com.wanna.expensetracker.entity.TransactionType;
 import com.wanna.expensetracker.exception.ExpenseNotFoundException;
 import com.wanna.expensetracker.expense.ExpenseMapper;
 import com.wanna.expensetracker.expense.dto.ExpenseCreateRequest;
@@ -97,5 +98,162 @@ public class ExpenseService {
             String category, LocalDateTime from, LocalDateTime to, Pageable pageable) {
         return expenseRepo.findByCategoryIgnoreCaseAndSpentAtBetween(category, from, to, pageable)
                 .map(ExpenseMapper::toResponse);
+    } 
+    
+    public Page<ExpenseResponse> findByKeyword(String keyword, Pageable pageable){
+    	return expenseRepo.findByDescriptionContainingIgnoreCase(keyword, pageable)
+    			.map(ExpenseMapper::toResponse);
     }
+    
+    public Page<ExpenseResponse> findByKeywordAndCategory(String keyword, String category, Pageable pageable){
+    	return expenseRepo.findByDescriptionContainingIgnoreCaseAndCategoryIgnoreCase(keyword, category, pageable)
+    			.map(ExpenseMapper::toResponse);
+    }
+    
+    public List<ExpenseResponse> findByType(TransactionType type){
+    	return expenseRepo.findByType(type)
+    			.stream()
+    			.map(ExpenseMapper::toResponse)
+    			.toList(); 
+    }
+    
+    public Page<ExpenseResponse> findByType(TransactionType type, Pageable pageable){
+    	return expenseRepo.findByType(type, pageable)
+    			.map(ExpenseMapper::toResponse);
+    }
+    
+    public List<ExpenseResponse> findAllWithFilters(
+            String keyword,
+            String category,
+            TransactionType type,
+            LocalDateTime from,
+            LocalDateTime to
+    ) {
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+        boolean hasCategory = category != null && !category.isBlank();
+        boolean hasType = type != null;
+        boolean hasRange = from != null && to != null;
+
+        if (hasKeyword && hasCategory) {
+            return expenseRepo
+                    .findByDescriptionContainingIgnoreCaseAndCategoryIgnoreCase(keyword, category)
+                    .stream()
+                    .map(ExpenseMapper::toResponse)
+                    .toList();
+        }
+
+        if (hasKeyword && hasType) {
+            return expenseRepo
+                    .findByDescriptionContainingIgnoreCaseAndType(keyword, type)
+                    .stream()
+                    .map(ExpenseMapper::toResponse)
+                    .toList();
+        }
+
+        if (hasCategory && hasType) {
+            return expenseRepo
+                    .findByCategoryIgnoreCaseAndType(category, type)
+                    .stream()
+                    .map(ExpenseMapper::toResponse)
+                    .toList();
+        }
+
+        if (hasKeyword) {
+            return expenseRepo
+                    .findByDescriptionContainingIgnoreCase(keyword)
+                    .stream()
+                    .map(ExpenseMapper::toResponse)
+                    .toList();
+        }
+
+        if (hasCategory) {
+            return expenseRepo
+                    .findByCategoryIgnoreCase(category)
+                    .stream()
+                    .map(ExpenseMapper::toResponse)
+                    .toList();
+        }
+
+        if (hasType) {
+            return expenseRepo
+                    .findByType(type)
+                    .stream()
+                    .map(ExpenseMapper::toResponse)
+                    .toList();
+        }
+
+        if (hasRange) {
+            return expenseRepo
+                    .findBySpentAtBetween(from, to)
+                    .stream()
+                    .map(ExpenseMapper::toResponse)
+                    .toList();
+        }
+
+        return expenseRepo.findAll()
+                .stream()
+                .map(ExpenseMapper::toResponse)
+                .toList();
+    }
+    
+    public Page<ExpenseResponse> findWithFilters(
+            String keyword,
+            String category,
+            TransactionType type,
+            LocalDateTime from,
+            LocalDateTime to,
+            Pageable pageable
+    ) {
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+        boolean hasCategory = category != null && !category.isBlank();
+        boolean hasType = type != null;
+        boolean hasRange = from != null && to != null;
+
+        if (hasKeyword && hasCategory) {
+            return expenseRepo
+                    .findByDescriptionContainingIgnoreCaseAndCategoryIgnoreCase(keyword, category, pageable)
+                    .map(ExpenseMapper::toResponse);
+        }
+
+        if (hasKeyword && hasType) {
+            return expenseRepo
+                    .findByDescriptionContainingIgnoreCaseAndType(keyword, type, pageable)
+                    .map(ExpenseMapper::toResponse);
+        }
+
+        if (hasCategory && hasType) {
+            return expenseRepo
+                    .findByCategoryIgnoreCaseAndType(category, type, pageable)
+                    .map(ExpenseMapper::toResponse);
+        }
+
+        if (hasKeyword) {
+            return expenseRepo
+                    .findByDescriptionContainingIgnoreCase(keyword, pageable)
+                    .map(ExpenseMapper::toResponse);
+        }
+
+        if (hasCategory) {
+            return expenseRepo
+                    .findByCategoryIgnoreCase(category, pageable)
+                    .map(ExpenseMapper::toResponse);
+        }
+
+        if (hasType) {
+            return expenseRepo
+                    .findByType(type, pageable)
+                    .map(ExpenseMapper::toResponse);
+        }
+
+        if (hasRange) {
+            return expenseRepo
+                    .findBySpentAtBetween(from, to, pageable)
+                    .map(ExpenseMapper::toResponse);
+        }
+
+        return expenseRepo.findAll(pageable)
+                .map(ExpenseMapper::toResponse);
+    }
+    
+    
 }

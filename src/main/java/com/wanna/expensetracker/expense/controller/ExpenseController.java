@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.wanna.expensetracker.entity.TransactionType;
 import com.wanna.expensetracker.expense.dto.ExpenseCreateRequest;
 import com.wanna.expensetracker.expense.dto.ExpenseResponse;
 import com.wanna.expensetracker.expense.service.ExpenseService;
@@ -34,8 +35,8 @@ public class ExpenseController {
 
     public ExpenseController(ExpenseService expenseService) {
         this.expenseService = expenseService;
-    }
-
+    } 
+ 
     @PostMapping
     public ResponseEntity<ExpenseResponse> create(
             @Valid @RequestBody ExpenseCreateRequest req
@@ -58,35 +59,33 @@ public class ExpenseController {
         return ResponseEntity.noContent().build();
     }
     
+    @GetMapping("/{id}")
+    public ExpenseResponse findById(@PathVariable Long id) {
+    	
+    	return expenseService.findById(id);
+    }
+    
     @GetMapping
-    public List<ExpenseResponse> findAll(
-            @RequestParam(required = false) String category 
+    public List<ExpenseResponse> findAll( 
+            @RequestParam(required = false) String category,
+            @RequestParam(required = false) TransactionType type,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @RequestParam(required = false) String keyword
     ) { 
-        if (category == null || category.isBlank()) {
-            return expenseService.findAll();
-        }
-        return expenseService.findByCategory(category);
+        return expenseService.findAllWithFilters(keyword, category, type, from, to);
     }
     
     @GetMapping("/paged")
-    public Page<ExpenseResponse> findPaged(
+    public Page<ExpenseResponse> findPaged( 
             @RequestParam(required = false) String category,
+            @RequestParam(required = false) TransactionType type,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @RequestParam(required = false) String keyword,
             @PageableDefault(size = 10, sort = "spentAt", direction = Sort.Direction.DESC) Pageable pageable
     ) {
-        boolean hasCategory = category != null && !category.isBlank();
-        boolean hasRange = from != null && to != null;
-
-        if (hasCategory && hasRange) {
-            return expenseService.findByCategoryAndSpentAtBetween(category, from, to, pageable);
-        }
-        if (hasRange) {
-            return expenseService.findBySpentAtBetween(from, to, pageable);
-        }
-        if (hasCategory) {
-            return expenseService.findByCategory(category, pageable);
-        }
-        return expenseService.findAll(pageable);
+       return expenseService.findWithFilters(keyword, category, type,from,to, pageable);
     }
 } 
+

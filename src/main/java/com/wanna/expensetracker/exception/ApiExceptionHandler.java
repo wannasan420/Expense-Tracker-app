@@ -6,9 +6,11 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 @RestControllerAdvice
@@ -49,6 +51,39 @@ public class ApiExceptionHandler {
 
         body.put("message", "Validation failed");
         body.put("fields", fieldErrors);
+
+        return ResponseEntity.badRequest().body(body);
+    }
+    
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String,Object>> handleIllegalArgument(
+    		IllegalArgumentException ex,
+    		HttpServletRequest request
+    		){
+    	Map<String, Object> body = new LinkedHashMap<>();
+    	 body.put("timestamp", LocalDateTime.now());
+         body.put("status", 400);
+         body.put("error", "Bad Request");
+         body.put("message", ex.getMessage());
+         body.put("path", request.getRequestURI());
+         
+         return ResponseEntity.badRequest().body(body);
+    }
+    
+    @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+    public ResponseEntity<Map<String, Object>> handleTypeMismatch(
+            MethodArgumentTypeMismatchException ex,
+            HttpServletRequest request
+    ) {
+        Map<String, Object> body = new LinkedHashMap<>();
+        body.put("timestamp", LocalDateTime.now());
+        body.put("status", 400);
+        body.put("error", "Bad Request");
+
+        String param = ex.getName();
+
+        body.put("message", "Invalid value for parameter '" + param + "'");
+        body.put("path", request.getRequestURI());
 
         return ResponseEntity.badRequest().body(body);
     }

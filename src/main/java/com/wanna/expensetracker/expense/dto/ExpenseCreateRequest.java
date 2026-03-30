@@ -3,11 +3,16 @@ package com.wanna.expensetracker.expense.dto;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import com.wanna.expensetracker.entity.TransactionType;
+
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 public class ExpenseCreateRequest {
+	
+	@NotNull(message = "type is required")
+	private TransactionType type;
 
     @NotNull(message = "amount is required")
     @DecimalMin(value = "0.01", message = "amount must be > 0")
@@ -20,6 +25,9 @@ public class ExpenseCreateRequest {
 
     // optional - if null, entity defaults it
     private LocalDateTime spentAt;
+    
+    public TransactionType getType() {return type;}
+    public void setType(TransactionType type) {this.type = type;}
 
     public BigDecimal getAmount() { return amount; }
     public void setAmount(BigDecimal amount) { this.amount = amount; }
