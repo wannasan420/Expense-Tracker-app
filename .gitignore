@@ -29,5 +29,11 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+target/
+.classpath
+.project
+.settings/
+.DS_Store
+
 ### VS Code ###
 .vscode/
